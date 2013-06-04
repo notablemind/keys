@@ -8,6 +8,7 @@ var eventmap = {
   18: 'alt',
   20: 'caps',
   27: 'escape',
+  32: 'space',
   33: 'page up',
   34: 'page down',
   35: 'end',
