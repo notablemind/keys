@@ -32,6 +32,17 @@ var keyname = function(e){
 };
 
 var keys = module.exports = function (config) {
+  var names = Object.keys(config);
+  for (var i=0; i<names.length; i++) {
+    if (names[i].indexOf('|') !== -1) {
+      var val = config[names[i]];
+      delete config[names[i]];
+      var parts = names[i].split('|');
+      for (var j=0; j<parts.length; j++) {
+        config[parts[j]] = val;
+      }
+    }
+  }
   return function (e) {
     var name = keyname(e);
     if (config[name]) {
