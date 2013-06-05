@@ -22,6 +22,12 @@ var eventmap = {
   91: 'meta'
 };
 
+var backmap = {};
+var names = Object.keys(eventmap);
+for (var i=0; i<names.length; i++) {
+  backmap[eventmap[names[i]]] = names[i];
+}
+
 var keyname = function(e){
   var b = eventmap[e.keyCode] || String.fromCharCode(e.keyCode);
   var name = b;
@@ -56,5 +62,33 @@ var keys = module.exports = function (config) {
       return res;
     }
   };
+};
+
+var validateOne = function (value) {
+  var parts = value.split(' ');
+  var last = parts[parts.length-1];
+  if (!backmap[last] && last.length !== 1) {
+    return false;
+  }
+  for (var i=0; i<parts.length - 1; i++) {
+    if (parts.slice(i+1, -1).indexOf(parts[i]) !== -1) {
+      return false; // dup modifier
+    }
+  }
+  var i = 0;
+  if (parts[i] == 'meta') i++;
+  if (parts[i] == 'ctrl') i++;
+  if (parts[i] == 'shift') i++;
+  if (parts[i] == 'alt') i++;
+  if (i < parts.length - 1) return false; // wrong order or extra junk
+  return true;
+};
+
+module.exports.validate = function (value) {
+  var parts = value.split('|');
+  for (var i=0; i<parts.length; i++) {
+    if (!validateOne(parts[i])) return false;
+  }
+  return true;
 };
 
