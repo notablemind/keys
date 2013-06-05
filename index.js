@@ -47,7 +47,13 @@ var keys = module.exports = function (config) {
   return function (e) {
     var name = keyname(e);
     if (config[name]) {
-      return config[name](e);
+      var res = config[name](e);
+      if (!res) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      return res;
     }
   };
 };
