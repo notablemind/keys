@@ -11,7 +11,7 @@
 
 Order is currently important (it probably shouldn't be though...) for modifiers.
 
-- [meta] [ctrl] [shift] [alt] key
+- [meta] [ctrl] [alt] [shift] key
 
 You can bind multiple key chords to the same function with the pipe `|`. Note:
 whitespace is also currently significant (though it probably shouldn't be).

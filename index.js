@@ -1,5 +1,5 @@
 
-var eventmap = {
+var keyCodeNames = {
   8:  'backspace',
   9:  'tab',
   13: 'return',
@@ -22,17 +22,16 @@ var eventmap = {
   91: 'meta'
 };
 
-var backmap = {};
-var names = Object.keys(eventmap);
-for (var i=0; i<names.length; i++) {
-  backmap[eventmap[names[i]]] = names[i];
-}
+var nameCodeKeys = {};
+Object.keys(keyCodeNames).forEach(function(name){
+  nameCodeKeys[keyCodeNames[name]] = name;
+});
 
 var keyname = function(e){
-  var b = eventmap[e.keyCode] || String.fromCharCode(e.keyCode);
+  var b = keyCodeNames[e.keyCode] || String.fromCharCode(e.keyCode);
   var name = b;
-  if (e.altKey && b !== 'alt') name = 'alt ' + name;
   if (e.shiftKey && b !== 'shift') name = 'shift ' + name;
+  if (e.altKey && b !== 'alt') name = 'alt ' + name;
   if (e.ctrlKey && b !== 'ctrl') name = 'ctrl ' + name;
   if (e.metaKey && b !== 'meta') name = 'meta ' + name;
   return name;
@@ -67,7 +66,7 @@ var keys = module.exports = function (config) {
 var validateOne = function (value) {
   var parts = value.split(' ');
   var last = parts[parts.length-1];
-  if (!backmap[last] && last.length !== 1) {
+  if (!nameCodeKeys[last] && last.length !== 1) {
     return false;
   }
   for (var i=0; i<parts.length - 1; i++) {
@@ -91,4 +90,34 @@ module.exports.validate = function (value) {
   }
   return true;
 };
+
+var normalize = module.exports.normalize = function(name){
+  var parts = name.replace(/^\s+/, '')
+                  .replace(/\s+$/, '').toLowerCase().split(/\s+/);
+  var mods = {ctrl:false, shift:false, alt:false, meta:false};
+  for (var i=0; i<parts.length - 1; i++) {
+    if (typeof mods[parts[i]] === 'undefined') {
+      // invalid modifiers
+      return false;
+    } else {
+      mods[parts[i]] = true;
+    }
+  }
+  var pre = [];
+  if (mods.meta)  pre.push('meta');
+  if (mods.ctrl)  pre.push('ctrl');
+  if (mods.alt)   pre.push('alt');
+  if (mods.shift) pre.push('shift');
+  var main = parts[parts.length - 1];
+  if (!nameCodeKeys[main] && main.length > 1) {
+    // invalid final
+    return false;
+  }
+  if (!nameCodeKeys[main]) {
+    main = main.toUpperCase();
+  }
+  return pre.concat('').join(' ') + main;
+};
+
+module.exports.keyname = keyname;
 
