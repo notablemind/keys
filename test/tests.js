@@ -50,7 +50,13 @@ describe('normalize', function(){
   normalizing.forEach(function(item){
     var title = item.length == 3 ? item.shift() : 'normalize ' + item[0];
     it('should ' + title, function(){
-      expect(keys.normalize(item[0])).to.eql(item[1]);
+      var res = keys.normalize(item[0]);
+      if (item[1] === false){
+        expect(res.error).to.be.ok;
+      } else {
+        expect(res.error).to.not.be.ok;
+        expect(res.value).to.eql(item[1]);
+      }
     });
   });
 });
