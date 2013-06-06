@@ -1,6 +1,8 @@
 
 # keys
 
+[![Build Status](https://travis-ci.org/notablemind/keys.png?branch=master)](https://travis-ci.org/notablemind/keys)
+
   Simple intuitive keybinding
 
 ## Installation

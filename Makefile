@@ -5,7 +5,7 @@ build: components index.js
 components: component.json
 	@component install --dev
 
-test:
+test: build
 	@mocha -R spec
 
 clean:
