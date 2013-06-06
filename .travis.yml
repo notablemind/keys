@@ -7,4 +7,5 @@ before_script:
   - component install --dev
   - component build --dev
   - npm install -g mocha
+  - npm install chai
 script: make test
