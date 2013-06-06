@@ -113,5 +113,31 @@ var normalize = function(name){
   return {value: pre + main};
 };
 
+var serialize = function (name) {
+  var parts = name.replace(/^\s+/, '')
+                  .replace(/\s+$/, '').toLowerCase().split(/\s+/);
+  var mods = {ctrlKey:false, shiftKey:false, altKey:false, metaKey:false};
+  for (var i=0; i<parts.length - 1; i++) {
+    if (typeof mods[parts[i] + 'Key'] === 'undefined') {
+      // invalid modifiers
+      return false;
+    } else {
+      mods[parts[i] + 'Key'] = true;
+    }
+  }
+  var main = parts[parts.length - 1];
+  if (!nameCodeKeys[main] && main.length > 1) {
+    // invalid final
+    return false;
+  }
+  if (nameCodeKeys[main]) {
+    mods.keyCode = nameCodeKeys[main];
+  } else {
+    mods.keyCode = main.charCodeAt(0);
+  }
+  return mods;
+};
+
+module.exports.serialize = serialize;
 module.exports.keyname = keyname;
 
