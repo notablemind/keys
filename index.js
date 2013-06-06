@@ -63,42 +63,34 @@ var keys = module.exports = function (config) {
   };
 };
 
-var validateOne = function (value) {
-  var parts = value.split(' ');
-  var last = parts[parts.length-1];
-  if (!nameCodeKeys[last] && last.length !== 1) {
-    return false;
-  }
-  for (var i=0; i<parts.length - 1; i++) {
-    if (parts.slice(i+1, -1).indexOf(parts[i]) !== -1) {
-      return false; // dup modifier
+module.exports.normalize = function (value) {
+  var parts = value.split('|')
+    , normal = [];
+  for (var i=0; i<parts.length; i++) {
+    var one = normalize(parts[i]);
+    if (one.value) normal.push(one.value);
+    else normal.push(parts[i]);
+    if (one.error) {
+      return {error: one.error, value: normal.concat(parts.slice(i)).join('|')};
     }
   }
-  var i = 0;
-  if (parts[i] == 'meta') i++;
-  if (parts[i] == 'ctrl') i++;
-  if (parts[i] == 'shift') i++;
-  if (parts[i] == 'alt') i++;
-  if (i < parts.length - 1) return false; // wrong order or extra junk
-  return true;
+  return {value: normal.join('|')};
 };
 
-module.exports.validate = function (value) {
-  var parts = value.split('|');
-  for (var i=0; i<parts.length; i++) {
-    if (!validateOne(parts[i])) return false;
-  }
-  return true;
-};
-
-var normalize = module.exports.normalize = function(name){
+/**
+ * name = a key
+ *
+ * If it's invalid: {error: message, [value: normalized]}
+ * If it's valid: {value: normalized}
+ */
+var normalize = function(name){
   var parts = name.replace(/^\s+/, '')
                   .replace(/\s+$/, '').toLowerCase().split(/\s+/);
   var mods = {ctrl:false, shift:false, alt:false, meta:false};
   for (var i=0; i<parts.length - 1; i++) {
     if (typeof mods[parts[i]] === 'undefined') {
       // invalid modifiers
-      return false;
+      return {error: 'Unknown modifier'};
     } else {
       mods[parts[i]] = true;
     }
@@ -108,15 +100,17 @@ var normalize = module.exports.normalize = function(name){
   if (mods.ctrl)  pre.push('ctrl');
   if (mods.alt)   pre.push('alt');
   if (mods.shift) pre.push('shift');
+  pre.push('');
+  pre = pre.join(' ');
   var main = parts[parts.length - 1];
   if (!nameCodeKeys[main] && main.length > 1) {
     // invalid final
-    return false;
+    return {error: 'Unknown key', value: pre + main};
   }
   if (!nameCodeKeys[main]) {
     main = main.toUpperCase();
   }
-  return pre.concat('').join(' ') + main;
+  return {value: pre + main};
 };
 
 module.exports.keyname = keyname;
