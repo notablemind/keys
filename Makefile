@@ -5,10 +5,13 @@ build: components index.js
 components: component.json
 	@component install --dev
 
-test: build
-	@mocha -R spec
+test: build node_modules
+	@./node_modules/.bin/mocha -R spec
+
+node_modules: package.json
+	@npm install
 
 clean:
-	rm -fr build components template.js
+	rm -fr build components template.js node_modules
 
 .PHONY: clean test
