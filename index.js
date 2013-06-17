@@ -67,11 +67,12 @@ module.exports.normalize = function (value) {
   var parts = value.split('|')
     , normal = [];
   for (var i=0; i<parts.length; i++) {
+    if (!parts[i].trim()) continue;
     var one = normalize(parts[i]);
     if (one.value) normal.push(one.value);
     else normal.push(parts[i]);
     if (one.error) {
-      return {error: one.error, value: normal.concat(parts.slice(i)).join('|')};
+      return {error: one.error, value: normal.concat(parts.slice(i+1)).join('|')};
     }
   }
   return {value: normal.join('|')};
