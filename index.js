@@ -52,7 +52,7 @@ var keys = module.exports = function (config) {
   return function (e) {
     var name = keyname(e);
     if (config[name]) {
-      var res = config[name](e);
+      var res = config[name].call(this, e)
       if (!res) {
         e.preventDefault();
         e.stopPropagation();
